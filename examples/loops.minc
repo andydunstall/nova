@@ -1,0 +1,7 @@
+fn main() -> i32 {
+	let mut x: i32 = 1;
+	loop (x < 5) {
+		x++;
+	}
+	return x;
+}
