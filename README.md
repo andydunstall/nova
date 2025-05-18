@@ -5,6 +5,8 @@
 Nova is a compiled statically typed a programming language. It aims to be
 a simplified combination of C and Rust.
 
+The compiler itself is written in C++.
+
 Note Nova is only a toy project, so isn't expected to be used...
 
 ## Compiler
@@ -14,6 +16,17 @@ The Nova compiler, `novac`, can be build with Bazel:
 bazel build //novac
 ```
 
+This will output the compiler to `bazel-bin/novac/novac`.
+
+You can then compile a program with `novac <path>`, such as
+`novac examples/return.nv`. The compiler will output x86 assembly for Linux,
+which can then be assembled and linked with `gcc`.
+
+`novac` accepts a few optional flags:
+* `--out`: Output path (defaults to the input path with the extension replaced)
+* `--stage`: Whether to stop compiling at a particular stage (`lex`, `ast`,
+`ir`, `assemble`, `x86`)
+* `--debug`: Whether to print debugging information during compilation
 
 ## v0.1
 
@@ -102,6 +115,10 @@ Both `break` and `continue` are supported.
 ### Comments
 
 Nova supports C style single line (`//`) comments.
+
+### Platforms
+
+Nova only supports x86-64 Linux.
 
 #### Examples
 
