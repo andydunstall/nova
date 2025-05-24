@@ -1,5 +1,6 @@
 #include "novac/compiler/compiler.h"
 
+#include "novac/ast/parser.h"
 #include "novac/lex/scanner.h"
 
 namespace novac {
@@ -9,10 +10,8 @@ Compiler::Compiler(bool debug) : debug_{debug} {}
 
 std::string Compiler::Compile(const std::string& src) {
   lex::Scanner scanner{src, debug_};
-  lex::Token token = scanner.Scan();
-  while (token.type != lex::Token::Type::kEof) {
-    token = scanner.Scan();
-  }
+  ast::Parser parser{scanner, debug_};
+  parser.Parse();
 
   return "";
 }

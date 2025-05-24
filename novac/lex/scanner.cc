@@ -280,16 +280,14 @@ void Scanner::PrintToken(Token tok) const {
   auto pos = fmt::format("{}:{}", tok.pos.line, tok.pos.column);
 
   if (tok.lit == "" || TokenTypeToString(tok.type) == tok.lit) {
-    fmt::println("{:6} {}", pos,
-                 TokenTypeToString(tok.type));
+    fmt::println("{:6} {}", pos, TokenTypeToString(tok.type));
   } else {
-    fmt::println("{:6} {} ({})", pos,
-                 TokenTypeToString(tok.type), tok.lit);
+    fmt::println("{:6} {} ({})", pos, TokenTypeToString(tok.type), tok.lit);
   }
 }
 
 Exception::Exception(const std::string& msg, Position pos) : msg_{msg} {
-  msg_ = fmt::format("{} ({}:{})", msg, pos.line, pos.column);
+  msg_ = fmt::format("{}:{}: {}", pos.line, pos.column, msg);
 }
 
 }  // namespace lex
