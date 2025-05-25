@@ -169,3 +169,15 @@ func Lookup(ident string) Token {
 	}
 	return IDENT
 }
+
+func (tok Token) IsLiteral() bool {
+	return literal_beg < tok && tok < literal_end
+}
+
+func (tok Token) IsOperator() bool {
+	return (operator_beg < tok && tok < operator_end) || tok == TILDE
+}
+
+func (tok Token) IsKeyword() bool {
+	return keyword_beg < tok && tok < keyword_end
+}
