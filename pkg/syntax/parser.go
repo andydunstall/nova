@@ -101,7 +101,7 @@ func (p *parser) parseBinaryExpr(l Expr, prec int) *BinaryExpr {
 	}
 }
 
-func (p *parser) parseCallExpr(name string) *CallExpr {
+func (p *parser) parseCallExpr(name *Ident) *CallExpr {
 	if p.debug {
 		defer un(trace(p, "CallExpr"))
 	}
@@ -151,7 +151,7 @@ func (p *parser) parseFactor() Expr {
 		p.expect(lex.RPAREN)
 		return expr
 	case lex.IDENT:
-		name := p.lit
+		name := p.parseIdent()
 		p.next()
 
 		if p.tok == lex.LPAREN {
@@ -382,8 +382,7 @@ func (p *parser) parseVarDecl() *VarDecl {
 	}
 
 	p.expect(lex.LET)
-	name := p.lit
-	p.expect(lex.IDENT)
+	name := p.parseIdent()
 	p.expect(lex.ASSIGN)
 
 	expr := p.parseExpr(0)
@@ -395,10 +394,12 @@ func (p *parser) parseVarDecl() *VarDecl {
 	}
 }
 
-func (p *parser) parseIdent() string {
-	ident := p.lit
+func (p *parser) parseIdent() *Ident {
+	name := p.lit
 	p.expect(lex.IDENT)
-	return ident
+	return &Ident{
+		Name: name,
+	}
 }
 
 func (p *parser) expect(tok lex.Token) {

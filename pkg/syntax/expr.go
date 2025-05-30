@@ -22,7 +22,7 @@ type BinaryExpr struct {
 func (n *BinaryExpr) expr() {}
 
 type VarExpr struct {
-	Name string
+	Name *Ident
 }
 
 func (n *VarExpr) expr() {}
@@ -35,7 +35,7 @@ type AssignExpr struct {
 func (n *AssignExpr) expr() {}
 
 type CallExpr struct {
-	Func string
+	Func *Ident
 	Args []Expr
 }
 
@@ -47,3 +47,9 @@ type BasicLitExpr struct {
 }
 
 func (n *BasicLitExpr) expr() {}
+
+type Ident struct {
+	Name string
+}
+
+func (n *Ident) expr() {}

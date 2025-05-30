@@ -5,14 +5,14 @@ type Decl interface {
 }
 
 type VarDecl struct {
-	Name string
+	Name *Ident
 	Expr Expr
 }
 
 func (n *VarDecl) decl() {}
 
 type FuncDecl struct {
-	Name string
+	Name *Ident
 	Body *BlockStmt
 }
 
