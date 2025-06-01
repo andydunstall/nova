@@ -29,6 +29,7 @@ type Printer struct {
 	indent int
 	last   byte
 	line   int
+	ptrmap map[any]int // *T -> line number
 }
 
 func NewPrinter(output io.Writer) *Printer {
@@ -36,6 +37,7 @@ func NewPrinter(output io.Writer) *Printer {
 		output: output,
 		line:   1,
 		last:   '\n',
+		ptrmap: make(map[any]int),
 	}
 }
 
@@ -94,9 +96,31 @@ func (p *Printer) print(x reflect.Value) {
 	case reflect.Interface:
 		p.print(x.Elem())
 
+	case reflect.Map:
+		p.printf("%s (len = %d) {", x.Type(), x.Len())
+		if x.Len() > 0 {
+			p.indent++
+			p.printf("\n")
+			for _, key := range x.MapKeys() {
+				p.print(key)
+				p.printf(": ")
+				p.print(x.MapIndex(key))
+				p.printf("\n")
+			}
+			p.indent--
+		}
+		p.printf("}")
+
 	case reflect.Pointer:
 		p.printf("*")
-		p.print(x.Elem())
+
+		ptr := x.Interface()
+		if line, exists := p.ptrmap[ptr]; exists {
+			p.printf("(obj @ %d)", line)
+		} else {
+			p.ptrmap[ptr] = p.line
+			p.print(x.Elem())
+		}
 
 	case reflect.Array:
 		p.printf("%s {", x.Type())
