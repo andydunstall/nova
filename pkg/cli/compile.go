@@ -7,6 +7,7 @@ import (
 	"github.com/andydunstall/nova/pkg/lex"
 	"github.com/andydunstall/nova/pkg/print"
 	"github.com/andydunstall/nova/pkg/syntax"
+	"github.com/andydunstall/nova/pkg/types"
 	"github.com/spf13/cobra"
 )
 
@@ -50,7 +51,15 @@ func runCompile(path string) error {
 	fmt.Println("syntax ast:")
 	print.Print(syntaxAST)
 
-	// Phase 2: ...
+	// Phase 2: Type checking.
+
+	typeInfo, err := types.Check(syntaxAST)
+	if err != nil {
+		return fmt.Errorf("types: %w", err)
+	}
+
+	fmt.Println("type info:")
+	print.Print(typeInfo)
 
 	return nil
 }
