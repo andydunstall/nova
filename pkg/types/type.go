@@ -53,3 +53,21 @@ func init() {
 		primatives[primativeStrs[i]] = Primative(i)
 	}
 }
+
+type Func struct {
+	Params []*Object
+	Return Type
+}
+
+func (t Func) String() string {
+	s := "func("
+	// TODO(andydunstall): Params
+	s += ")"
+	if t.Return != nil {
+		s += " -> "
+		s += t.Return.String()
+	}
+	return s
+}
+
+func (t Func) typeImpl() {}

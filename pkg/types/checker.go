@@ -43,6 +43,9 @@ func (c *checker) checkStmt(stmt syntax.Stmt) error {
 		return c.checkDecl(stmt.Decl)
 	case *syntax.ReturnStmt:
 		return c.checkReturnStmt(stmt)
+	case *syntax.ExprStmt:
+		// TODO(andydunstall)
+		return nil
 	case *syntax.BlockStmt:
 		return c.checkBlockStmt(stmt)
 	default:
@@ -99,6 +102,40 @@ func (c *checker) checkFuncDec(decl *syntax.FuncDecl) error {
 	// TODO(andydunstall): Check conflicts.
 
 	// TODO(andydunstall)
+
+	var params []*Object
+	for _, param := range decl.Params {
+		p, ok := primatives[param.Type]
+		if !ok {
+			return fmt.Errorf("unknown type: %s", param.Type)
+		}
+
+		o := &Object{
+			Name: param.Name.Name,
+			Type: p,
+		}
+		c.info.Defs[param.Name] = o
+
+		params = append(params, o)
+	}
+
+	var ret Type
+	if decl.ReturnType != "" {
+		var ok bool
+		ret, ok = primatives[decl.ReturnType]
+		if !ok {
+			return fmt.Errorf("unknown type: %s", decl.ReturnType)
+		}
+	}
+
+	fn := &Func{
+		Params: params,
+		Return: ret,
+	}
+	c.info.Defs[decl.Name] = &Object{
+		Name: decl.Name.Name,
+		Type: fn,
+	}
 
 	if err := c.checkBlockStmt(decl.Body); err != nil {
 		return err
