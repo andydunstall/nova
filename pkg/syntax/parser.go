@@ -3,6 +3,7 @@ package syntax
 import (
 	"fmt"
 
+	"github.com/andydunstall/nova/pkg/assert"
 	"github.com/andydunstall/nova/pkg/lex"
 )
 
@@ -152,8 +153,6 @@ func (p *parser) parseFactor() Expr {
 		return expr
 	case lex.IDENT:
 		name := p.parseIdent()
-		p.next()
-
 		if p.tok == lex.LPAREN {
 			return p.parseCallExpr(name)
 		} else {
@@ -330,50 +329,40 @@ func (p *parser) parseFuncDecl() *FuncDecl {
 		defer un(trace(p, "FuncDecl"))
 	}
 
-	p.expect(lex.FN)
-	funcName := p.parseIdent()
+	var funcDecl FuncDecl
 
-	// var funcType FuncType
+	p.expect(lex.FN)
+	funcDecl.Name = p.parseIdent()
 
 	p.expect(lex.LPAREN)
-	// for p.tok != lex.RPAREN {
-	// 	var param Param
 
-	// 	param.Name = p.lit
-	// 	p.expect(lex.IDENT)
+	for p.tok != lex.RPAREN {
+		var param FuncParam
 
-	// 	p.expect(lex.COLON)
+		param.Name = p.parseIdent()
 
-	// 	if !p.tok.IsType() {
-	// 		panic("expected type")
-	// 	}
-	// 	param.Type = p.tok
-	// 	p.next()
+		// Parse type.
+		p.expect(lex.COLON)
+		typ := p.parseIdent()
+		param.Type = typ.Name
 
-	// 	funcType.Params2 = append(funcType.Params2, param)
+		funcDecl.Params = append(funcDecl.Params, param)
 
-	// 	if p.tok != lex.RPAREN {
-	// 		p.expect(lex.COMMA)
-	// 	}
-	// }
+		if p.tok != lex.RPAREN {
+			p.expect(lex.COMMA)
+		}
+	}
 	p.expect(lex.RPAREN)
 
 	if p.tok == lex.ARROW {
 		p.next()
 
-		// if !p.tok.IsType() {
-		// 	panic("expected type")
-		// }
-		// funcType.ReturnType = p.tok
-		p.next()
+		typ := p.parseIdent()
+		funcDecl.ReturnType = typ.Name
 	}
 
-	body := p.parseBlockStmt()
-	return &FuncDecl{
-		Name: funcName,
-		// Type: &funcType,
-		Body: body,
-	}
+	funcDecl.Body = p.parseBlockStmt()
+	return &funcDecl
 }
 
 func (p *parser) parseVarDecl() *VarDecl {
@@ -383,14 +372,19 @@ func (p *parser) parseVarDecl() *VarDecl {
 
 	p.expect(lex.LET)
 	name := p.parseIdent()
-	p.expect(lex.ASSIGN)
 
+	// Parse type.
+	p.expect(lex.COLON)
+	typ := p.parseIdent()
+
+	p.expect(lex.ASSIGN)
 	expr := p.parseExpr(0)
 	p.expect(lex.SEMICOLON)
 
 	return &VarDecl{
 		Name: name,
 		Expr: expr,
+		Type: typ.Name,
 	}
 }
 
@@ -404,7 +398,8 @@ func (p *parser) parseIdent() *Ident {
 
 func (p *parser) expect(tok lex.Token) {
 	if p.tok != tok {
-		panic("unexpected lex: " + p.tok.String())
+		assert.Panicf("unexpected token: %s; wanted: %s", p.tok, tok)
+		return // Unreachable.
 	}
 	p.next()
 }
