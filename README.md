@@ -2,7 +2,7 @@
 
 > :warning: In progress...
 
-Nova is a compiled statically typed programming language. It aims to be
+Nova is a compiled statically typed programming language, aiming to be
 a simplified alternative of C++.
 
 The compiler itself is written in Go (will rewrite in Nova once its mature
@@ -12,12 +12,14 @@ Note Nova is only a toy project, so isn't expected to be used...
 
 ## Compiler
 
-Build the Nova compiler with `go build main.go`. Then invoke the compiler
+Build the Nova compiler with `go build -o nova main.go`. Then invoke the compiler
 with `nova build <path>`, such as `nova build examples/return.nv`.
 
 The executable will be output to the same path as the input (with the
 extension removed) by default, such as `examples/return.nv` will be output
 to `examples/return`.
+
+See `nova -h` for details.
 
 ## v0.1
 
@@ -31,7 +33,7 @@ In v0.1 only a single Nova file is supported, with no module support.
 
 #### Data Types
 
-Only integer and boolean types are supported in v0.1:
+Only integer, boolean and `struct` types are supported in v0.1:
 - `u8`
 - `i8`
 - `u16`
@@ -41,6 +43,9 @@ Only integer and boolean types are supported in v0.1:
 - `u64`
 - `i64`
 - `bool`
+- `struct`
+
+Pointers are also supported, such as `*i32`.
 
 #### Variables
 
@@ -48,24 +53,17 @@ Variables are defined with the `let` keyword:
 ```
 let a: i32 = 5;
 let b: bool = false;
-let mut c: u64 = 0xffffff00;
-let mut d: u8 = 0b11001100;
+let c: u64 = 0xffffff00;
+let d: u8 = 0b11001100;
 ```
 
-Similar to Rust, variables are constant by default, though can be mutable
-by setting the `mut` keyword.
-
-The type can be omitted if it can be inferred from the initializer:
-```
-let a = 5;
-let b = false;
-```
+v0.1 doesn't support inferring types, so the type must be provided.
 
 #### Functions
 
 Functions are defined with the `fn` keyword:
 ```
-fn add(a: mut i32, b: mut i32) -> i32 {
+fn add(a: i32, b: i32) -> i32 {
 	return a + b;
 }
 ```
@@ -82,8 +80,6 @@ if (cond1) {
 	// ...
 }
 ```
-
-Note unlike Rust, if-else statements are not expressions.
 
 #### Loops
 
@@ -102,6 +98,35 @@ loop {
 ```
 
 Both `break` and `continue` are supported.
+
+### Structures
+
+v0.1 supports structures with fields and members (including constructors
+and destructors):
+```
+struct MyStruct {
+	field1 u32
+	field2 u32
+};
+
+// Constructor.
+fn MyStruct::new(f1 u32, f2: u32) -> MyStruct {
+	return MyStruct{
+		field1: f1,
+		field2: f2,
+	};
+}
+
+// Destructor.
+fn MyStruct::delete() {
+	// ...
+}
+
+// Method.
+fn MyStruct::sum() -> u32 {
+	return self.field1 + self.field2;
+}
+```
 
 ### Comments
 
