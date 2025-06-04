@@ -3,7 +3,7 @@
 > :warning: In progress...
 
 Nova is a compiled statically typed programming language. It aims to be
-a simplified combination of C, Go and Rust.
+a simplified alternative of C++.
 
 The compiler itself is written in Go (will rewrite in Nova once its mature
 enough).
